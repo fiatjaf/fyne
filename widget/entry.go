@@ -26,15 +26,18 @@ const (
 
 // Declare conformity with interfaces
 var _ fyne.Disableable = (*Entry)(nil)
-var _ fyne.Draggable = (*Entry)(nil)
-var _ fyne.Focusable = (*Entry)(nil)
-var _ fyne.Tappable = (*Entry)(nil)
-var _ fyne.Widget = (*Entry)(nil)
-var _ desktop.Mouseable = (*Entry)(nil)
-var _ desktop.Keyable = (*Entry)(nil)
-var _ mobile.Keyboardable = (*Entry)(nil)
-var _ mobile.Touchable = (*Entry)(nil)
-var _ fyne.Tabbable = (*Entry)(nil)
+
+var (
+	_ fyne.Draggable      = (*Entry)(nil)
+	_ fyne.Focusable      = (*Entry)(nil)
+	_ fyne.Tappable       = (*Entry)(nil)
+	_ fyne.Widget         = (*Entry)(nil)
+	_ desktop.Mouseable   = (*Entry)(nil)
+	_ desktop.Keyable     = (*Entry)(nil)
+	_ mobile.Keyboardable = (*Entry)(nil)
+	_ mobile.Touchable    = (*Entry)(nil)
+	_ fyne.Tabbable       = (*Entry)(nil)
+)
 
 // Entry widget allows simple text to be input when focused.
 type Entry struct {
@@ -1073,7 +1076,6 @@ func (e *Entry) selectAll() {
 // is either a) in progress or b) about to start
 // returns true if the keypress has been fully handled
 func (e *Entry) selectingKeyHandler(key *fyne.KeyEvent) bool {
-
 	if e.selectKeyDown && !e.selecting {
 		switch key.Name {
 		case fyne.KeyUp, fyne.KeyDown,
@@ -1172,6 +1174,8 @@ func (e *Entry) textPosFromRowCol(row, col int) int {
 	}
 	return b.begin + col
 }
+
+func (e *Entry) TextPosFromRowCol(row, col int) int { return e.textPosFromRowCol(row, col) }
 
 func (e *Entry) syncSegments() {
 	colName := theme.ColorNameForeground
@@ -1620,8 +1624,12 @@ func (e *entryContent) CreateRenderer() fyne.WidgetRenderer {
 	}
 	objects := []fyne.CanvasObject{placeholder, provider, e.entry.cursorAnim.cursor}
 
-	r := &entryContentRenderer{e.entry.cursorAnim.cursor, []fyne.CanvasObject{}, objects,
-		provider, placeholder, e}
+	r := &entryContentRenderer{
+		e.entry.cursorAnim.cursor,
+		[]fyne.CanvasObject{},
+		objects,
+		provider, placeholder, e,
+	}
 	r.updateScrollDirections()
 	r.Layout(e.size)
 	return r
